@@ -1,0 +1,70 @@
+Documentation.
+snake.py is a library that creates the snake Game in a class called Game.
+Snake has the following attributes and methods:
+Game.snake a Snake object (see later)
+Game.apples an Apple object (see later)
+Game.grid an array of Cell classes (see later)
+Game.gridsize the size of the playing grid
+Game.lost holds the state of the game
+Game.update("direction") updates the game given the direction off the keys, returns None if succesfull otherwise -1 for an illegal direction.
+
+The Snake objects contains the following attributes:
+Snake.pos an array consisting of tuples (row, collumn) the head of the snake is the first tuple of the array, and the tail is the last one.
+Snake.alive says if the snake's alive or not
+
+The Apple object contains the following attributes:
+Apple.pos is an array of tuples (row, collumn) that holds the coordinates of all the apples
+
+The Cell object contains the following attributes:
+Cell.pos a tuple containing the position of the cell in the grid (row, collumn)
+Cell.state contains the state of each cell: -1 is an Apple 0 is nothing and anything bigger than 0 contains a snake with the value being how long the snake has been there (max value = value of the snake)
+
+To create a game use the following syntax:
+game = Game((sizex, sizey), numberOfApples)
+this creates a game with a grid, a snake in the middle of the grid with a length of 5, heading right and an amount of apples.
+
+game.update("right)
+this does one update cycle of the snake in that direction if possible
+
+acces any value of the grid with:
+
+game.grid[i][j].state
+
+some example code (from time import sleep, from keyboard import is_pressed:
+def printTocmd(game):
+    output = ""
+    for i in range(game.gridSize[0]):
+        for j in range(game.gridSize[1]):
+            value = game.grid[i][j].state
+            if value == -1:
+                output += "A"
+            elif value == 0:
+                output += "."
+            else:
+                output += str(value)
+            output += " "
+        output += "\n"
+    print(output)
+
+def clear():
+    os.system("cls")
+def main():
+    game = snk.Game((20,20), 10)
+    lastdirection = "right"
+    while not game.lost:
+        if is_pressed("right") and game.update("right") != -1:
+            lastdirection = "right"
+        elif is_pressed("left") and game.update("left") != -1:
+            lastdirection = "left"
+        elif is_pressed("down") and game.update("down") != -1:
+            lastdirection = "down"
+        elif is_pressed("up") and game.update("up") != -1:
+            lastdirection = "up"
+        else: game.update(lastdirection)
+        clear()
+        printTocmd(game)
+        print(game.snake.alive)
+        sleep(1)
+    input()
+    
+    
