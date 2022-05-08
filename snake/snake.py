@@ -1,4 +1,5 @@
 from random import randint
+from time import sleep
 class Game():
     def __init__(self, gridSize = (10, 10), numberOfApples = 3):
         self.gridSize = gridSize
@@ -16,22 +17,10 @@ class Game():
         return grid
 
     def update(self, direction):
+        self.snake.update(self.gridSize, direction,self.apples)
+        self.grid = self.__createGrid(self.gridSize, self.snake.pos, self.apples.pos)
+        self.lost = not self.snake.alive
 
-        if ((self.snake.pos[0][0] - 1) % len(self.grid), self.snake.pos[0][1]) == self.snake.pos[1]:
-            forbiddenDirection = "up"
-        elif ((self.snake.pos[0][0] + 1 )% len(self.grid), self.snake.pos[0][1]) == self.snake.pos[1]:
-            forbiddenDirection = "down"
-        elif (self.snake.pos[0][0], (self.snake.pos[0][1] - 1)% len(self.grid[0]) ) == self.snake.pos[1]:
-            forbiddenDirection = "left"
-        else:
-            forbiddenDirection = "right"
-        if forbiddenDirection != direction:
-            self.snake.update(self.gridSize, direction,self.apples)
-            self.grid = self.__createGrid(self.gridSize, self.snake.pos, self.apples.pos)
-            self.lost = not self.snake.alive
-            return None
-        else:
-            return -1
 
 class Snake():
     #the Snake object contains an array of positions with the head on index 0
@@ -39,6 +28,7 @@ class Snake():
         self.alive = True
         self.pos = self.__createSnake(gridSize)
         self.length = len(self.pos)
+        self.direction =  "right"
     def __createSnake(self, gridSize):
         pos = list()
         for i in range(5):
@@ -51,14 +41,19 @@ class Snake():
 
     def update(self, gridSize, direction, apples):
         head = self.pos[0]
-        if direction == "right":
-            nextHead = (head[0], (head[1] + 1) % gridSize[1])
-        elif direction == "left":
-            nextHead = (head[0], (head[1] - 1) % gridSize[1])
-        elif direction == "up":
-            nextHead = ((head[0]-1) % gridSize[0], head[1])
-        elif direction == "down":
-            nextHead = ((head[0] + 1) % gridSize[0], head[1])
+        nextHead = self.pos[1]
+        while nextHead == self.pos[1]:
+            if direction == "right":
+                nextHead = (head[0], (head[1] + 1) % gridSize[1])
+            elif direction == "left":
+                nextHead = (head[0], (head[1] - 1) % gridSize[1])
+            elif direction == "up":
+                nextHead = ((head[0]-1) % gridSize[0], head[1])
+            elif direction == "down":
+                nextHead = ((head[0] + 1) % gridSize[0], head[1])
+            if nextHead == self.pos[1]:
+                direction = self.direction
+        self.direction = direction
         if nextHead in self.pos:
             self.alive = False
         self.pos.insert(0, nextHead)
@@ -68,6 +63,7 @@ class Snake():
                 i += 1
             prohibitedPos = self.pos + apples.pos
             apples.pos[i] = apples.generateApplePositions(gridSize, 1, prohibitedPos)[0]
+            self.length = len(self.pos)
         else:
             self.pos.pop(len(self.pos)-1)
 
@@ -103,3 +99,8 @@ class Cell():
                 return -1
         else: return 0
 
+if __name__ == "__main__":
+    game = Game((10,10), 3)
+    while True:
+        game.update("left")
+        sleep(1)
